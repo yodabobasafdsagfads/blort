@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>WebRoyale - Battle Royale</title>
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/assets/fonts/game-font.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/textures/ui-atlas.png" as="image">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/hud.css">
+    <link rel="stylesheet" href="/css/menus.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="screen active">
+        <div class="loading-content">
+            <div class="logo"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="loading-progress"></div>
+            </div>
+            <div class="loading-text" id="loading-text">Initializing...</div>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen">
+        <div class="menu-background"></div>
+        <div class="menu-content">
+            <h1 class="game-title">WEBROYALE</h1>
+            <div class="menu-buttons">
+                <button id="btn-play" class="btn-primary">PLAY</button>
+                <button id="btn-settings" class="btn-secondary">SETTINGS</button>
+                <button id="btn-locker" class="btn-secondary">LOCKER</button>
+            </div>
+            <div class="player-stats">
+                <span id="player-name">Player</span>
+                <span id="player-level">Level 1</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matchmaking Screen -->
+    <div id="matchmaking" class="screen">
+        <div class="matchmaking-content">
+            <h2>Finding Match...</h2>
+            <div class="player-count"><span id="lobby-players">0</span>/100</div>
+            <button id="btn-cancel-queue" class="btn-secondary">CANCEL</button>
+        </div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- In-Game HUD -->
+    <div id="game-hud" class="hidden">
+        <!-- Top Bar -->
+        <div class="hud-top">
+            <div class="storm-timer">
+                <div class="storm-icon"></div>
+                <span id="storm-time">0:00</span>
+            </div>
+            <div class="players-alive">
+                <span id="alive-count">100</span>
+                <span class="alive-icon">👥</span>
+            </div>
+        </div>
+
+        <!-- Kill Feed -->
+        <div class="kill-feed" id="kill-feed">
+            <!-- Dynamic kill entries -->
+        </div>
+
+        <!-- Center Crosshair -->
+        <div class="crosshair"></div>
+
+        <!-- Bottom Left - Health/Shield -->
+        <div class="hud-bottom-left">
+            <div class="health-bar">
+                <div class="health-fill" id="health-fill"></div>
+                <span class="health-text" id="health-text">100</span>
+            </div>
+            <div class="shield-bar">
+                <div class="shield-fill" id="shield-fill"></div>
+                <span class="shield-text" id="shield-text">0</span>
+            </div>
+        </div>
+
+        <!-- Bottom Center - Inventory Hotbar -->
+        <div class="hud-bottom-center">
+            <div class="hotbar">
+                <div class="hotbar-slot active" data-slot="0">
+                    <div class="slot-content">
+                        <img class="slot-icon" src="" alt="">
+                        <span class="slot-ammo">30</span>
+                    </div>
+                    <span class="slot-key">1</span>
+                </div>
+                <div class="hotbar-slot" data-slot="1">
+                    <span class="slot-key">2</span>
+                </div>
+                <div class="hotbar-slot" data-slot="2">
+                    <span class="slot-key">3</span>
+                </div>
+                <div class="hotbar-slot" data-slot="3">
+                    <span class="slot-key">4</span>
+                </div>
+                <div class="hotbar-slot" data-slot="4">
+                    <span class="slot-key">5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Right - Ammo/Resources -->
+        <div class="hud-bottom-right">
+            <div class="ammo-display">
+                <span class="ammo-current" id="ammo-current">30</span>
+                <span class="ammo-divider">/</span>
+                <span class="ammo-reserve" id="ammo-reserve">210</span>
+            </div>
+            <div class="resources">
+                <div class="resource-item">
+                    <span class="resource-icon wood">🪵</span>
+                    <span class="resource-count" id="wood-count">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-icon stone">🪨</span>
+                    <span class="resource-count" id="stone-count">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-icon metal">⚙️</span>
+                    <span class="resource-count" id="metal-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Minimap -->
+        <div class="minimap">
+            <canvas id="minimap-canvas" width="200" height="200"></canvas>
+            <div class="storm-circle"></div>
+        </div>
+
+        <!-- Building Menu -->
+        <div class="build-menu hidden" id="build-menu">
+            <div class="build-option active" data-build="wall">
+                <div class="build-icon">🧱</div>
+                <span class="build-key">Q</span>
+            </div>
+            <div class="build-option" data-build="floor">
+                <div class="build-icon">⬜</div>
+                <span class="build-key">E</span>
+            </div>
+            <div class="build-option" data-build="ramp">
+                <div class="build-icon">🔺</div>
+                <span class="build-key">R</span>
+            </div>
+            <div class="build-option" data-build="roof">
+                <div class="build-icon">🔷</div>
+                <span class="build-key">T</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory/Defeat Screen -->
+    <div id="end-screen" class="screen">
+        <div class="end-content">
+            <h1 id="end-title">VICTORY ROYALE</h1>
+            <div class="match-stats">
+                <div class="stat">
+                    <span class="stat-label">Eliminations</span>
+                    <span class="stat-value" id="stat-kills">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Placement</span>
+                    <span class="stat-value" id="stat-place">#1</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Damage</span>
+                    <span class="stat-value" id="stat-damage">0</span>
+                </div>
+            </div>
+            <button id="btn-return-lobby" class="btn-primary">RETURN TO LOBBY</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Settings</h2>
+            <div class="settings-tabs">
+                <button class="tab active" data-tab="graphics">Graphics</button>
+                <button class="tab" data-tab="audio">Audio</button>
+                <button class="tab" data-tab="controls">Controls</button>
+            </div>
+            <div class="settings-panel" id="graphics-settings">
+                <!-- Graphics settings -->
+            </div>
+            <button class="btn-close">✕</button>
+        </div>
+    </div>
+
+    <!-- Module Scripts -->
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>
