@@ -33,4 +33,15 @@ export class InstancedEnvironment {
         const quaternion = new THREE.Quaternion().setFromEuler(rotation);
         matrix.compose(position, quaternion, scale);
         
-        instance.mesh.setMatrixAt(
+        instance.mesh.setMatrixAt(    instance.mesh.instanceMatrix.needsUpdate = true;
+// Use BufferGeometryUtils.mergeGeometries for static buildings
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';function batchStaticBuildings(buildingMeshes) {
+const geometries = buildingMeshes.map(mesh => {
+const geo = mesh.geometry.clone();
+geo.applyMatrix4(mesh.matrix);
+return geo;
+});const mergedGeometry = mergeGeometries(geometries);
+const mergedMesh = new THREE.Mesh(mergedGeometry, buildingMeshes[0].material);return mergedMesh;
+}
+    }
+
